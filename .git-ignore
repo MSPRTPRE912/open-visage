@@ -1,0 +1,4 @@
+.vsccode
+.idea
+.env
+venv/
