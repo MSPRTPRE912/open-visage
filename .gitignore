@@ -1,0 +1,6 @@
+.vsccode
+.idea
+.env
+venv/
+build/
+template/

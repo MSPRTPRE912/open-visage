@@ -1,0 +1,41 @@
+version: 1.0
+provider:
+  name: openfaas
+  gateway: http://127.0.0.1:8080
+
+functions:
+  generate-password:
+    lang: Dockerfile
+    handler: ./generate-password
+    image: liampulsation/generate-password:latest
+    environment:
+      read_timeout: 10
+      write_timeout: 10
+      exec_timeout: 10
+      secret_key: "your-secret-key"
+    annotations:
+      com.openfaas.scale.zero: "true"
+
+  generate-2fa:
+    lang: Dockerfile
+    handler: ./generate-2fa
+    image: liampulsation/generate-2fa:latest
+    environment:
+      read_timeout: 10
+      write_timeout: 10
+      exec_timeout: 10
+      secret_key: "your-secret-key"
+    annotations:
+      com.openfaas.scale.zero: "true"
+
+  authenticate:
+    lang: Dockerfile
+    handler: ./authenticate
+    image: liampulsation/authenticate:latest
+    environment:
+      read_timeout: 10
+      write_timeout: 10
+      exec_timeout: 10
+      secret_key: "your-secret-key"
+    annotations:
+      com.openfaas.scale.zero: "true"
