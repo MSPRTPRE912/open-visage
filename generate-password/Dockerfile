@@ -1,4 +1,8 @@
+FROM ghcr.io/openfaas/classic-watchdog:0.2.1 as watchdog
+
 FROM python:3.11-slim
+
+COPY --from=watchdog /fwatchdog /usr/bin/fwatchdog
 
 WORKDIR /function
 COPY requirements.txt ./
