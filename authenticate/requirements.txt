@@ -1,3 +1,6 @@
 cryptography
 pyotp
 pydantic
+psycopg2-binary
+qrcode
+Pillow

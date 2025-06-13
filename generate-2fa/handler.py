@@ -1,19 +1,31 @@
-import pyotp, qrcode, base64, io, sqlite3
+import json
+import pyotp, qrcode, base64, io, psycopg2, os
 from cryptography.fernet import Fernet
 from pydantic import BaseModel
 
-DB_PATH = "data.db"
-SECRET_KEY = Fernet.generate_key()
+PG_CONN = {
+    "dbname": os.environ["db_name"],
+    "user": os.environ["db_user"],
+    "password": "Pa$$w0rd",
+    "host": os.environ["db_host"],
+    "port": os.environ["db_port"]
+}
+
+with open("/var/openfaas/secrets/secret-key", "r") as f:
+    SECRET_KEY = f.read().strip().encode()
+
 cipher = Fernet(SECRET_KEY)
 
 class Payload(BaseModel):
-    user_id: str
+    email: str
 
-def handle(req):
-    data = Payload.model_validate_json(req)
+def handle(event, context):
+    body = event.body
+    data = Payload.model_validate_json(body)
+
     secret = pyotp.random_base32()
     totp = pyotp.TOTP(secret)
-    uri = totp.provisioning_uri(name=data.user_id, issuer_name="COFRAP")
+    uri = totp.provisioning_uri(name=data.email, issuer_name="COFRAP")
 
     img = qrcode.make(uri)
     buffer = io.BytesIO()
@@ -22,9 +34,27 @@ def handle(req):
 
     encrypted_secret = cipher.encrypt(secret.encode()).decode()
 
-    with sqlite3.connect(DB_PATH) as conn:
-        conn.execute("CREATE TABLE IF NOT EXISTS twofa (user_id TEXT, secret TEXT)")
-        conn.execute("INSERT INTO twofa (user_id, secret) VALUES (?, ?)", (data.user_id, encrypted_secret))
-        conn.commit()
+    conn = psycopg2.connect(**PG_CONN)
+    cur = conn.cursor()
 
-    return {"2fa_qrcode": qr_b64}
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS twofa (
+            email TEXT,
+            secret TEXT
+        )
+    """)
+
+    cur.execute("INSERT INTO twofa (email, secret) VALUES (%s, %s)",
+                (data.email, encrypted_secret))
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    return {
+        "statusCode": 200,
+        "body": json.dumps({
+            "2fa_qrcode": qr_b64
+        }),
+        "headers": {"Content-Type": "application/json"}
+    }

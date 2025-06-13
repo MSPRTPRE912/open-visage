@@ -1,3 +1,5 @@
 cryptography
 qrcode
 pydantic
+psycopg2-binary
+Pillow

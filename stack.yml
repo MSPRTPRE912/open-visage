@@ -5,37 +5,46 @@ provider:
 
 functions:
   generate-password:
-    lang: Dockerfile
+    lang: python3-http
     handler: ./generate-password
     image: liampulsation/generate-password:latest
     environment:
-      read_timeout: 10
-      write_timeout: 10
-      exec_timeout: 10
-      secret_key: "your-secret-key"
+      db_host: "cofrap-db-svc"
+      db_port: 5432
+      db_name: "cofrap"
+      db_user: "cofrap"
+    secrets:
+      - secret-key
+      - password-db
     annotations:
       com.openfaas.scale.zero: "true"
 
   generate-2fa:
-    lang: Dockerfile
+    lang: python3-http
     handler: ./generate-2fa
     image: liampulsation/generate-2fa:latest
     environment:
-      read_timeout: 10
-      write_timeout: 10
-      exec_timeout: 10
-      secret_key: "your-secret-key"
+      db_host: "cofrap-db-svc"
+      db_port: 5432
+      db_name: "cofrap"
+      db_user: "cofrap"
+    secrets:
+      - secret-key
+      - password-db
     annotations:
       com.openfaas.scale.zero: "true"
 
   authenticate:
-    lang: Dockerfile
+    lang: python3-http
     handler: ./authenticate
     image: liampulsation/authenticate:latest
     environment:
-      read_timeout: 10
-      write_timeout: 10
-      exec_timeout: 10
-      secret_key: "your-secret-key"
+      db_host: "cofrap-db-svc"
+      db_port: 5432
+      db_name: "cofrap"
+      db_user: "cofrap"
+    secrets:
+      - secret-key
+      - password-db
     annotations:
       com.openfaas.scale.zero: "true"
