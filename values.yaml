@@ -1,0 +1,7 @@
+gateway:
+  readonly: false
+  cors:
+    enabled: true
+    allowed_origins: "*"
+    allowed_methods: "GET, POST, PUT, DELETE, OPTIONS"
+    allowed_headers: "Content-Type"

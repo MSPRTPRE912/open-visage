@@ -6,10 +6,13 @@ import pyotp, secrets, qrcode, base64, string, io, os
 from cryptography.fernet import Fernet
 from pydantic import BaseModel
 
+with open("/var/openfaas/secrets/password-db", "r") as f:
+    PASSWORD_DB = f.read().strip().encode()
+
 PG_CONN = {
     "dbname": os.environ["db_name"],
     "user": os.environ["db_user"],
-    "password": "Pa$$w0rd",
+    "password": PASSWORD_DB,
     "host": os.environ["db_host"],
     "port": os.environ["db_port"]
 }
