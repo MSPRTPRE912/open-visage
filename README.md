@@ -1,3 +1,6 @@
+# Fonctions OpenFaas COFRAP
+
+Ce dépôt contient les fonctions OpenFaas utilisées par la COFRAP.
 
 ## Installation
 
